@@ -1,0 +1,6 @@
+zuul:
+  ignoredServices: '*'
+  routes:
+    api:
+      path: /api/orders/**
+      serviceId: order-service

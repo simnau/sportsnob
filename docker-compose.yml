@@ -1,0 +1,75 @@
+version: '2.1'
+services:
+  eurekaserver:
+    build: ./eurekaserver/
+    restart: always
+    ports:
+      - "8080:8761"
+    networks:
+      - sportsnob-network
+    environment:
+      - EUREKA_ZONE=http://eurekaserver:8761/eureka/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 30s
+      timeout: 10s
+
+  configserver:
+    build: ./configserver/
+    restart: always
+    networks:
+      - sportsnob-network
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      - EUREKA_ZONE=http://eurekaserver:8761/eureka/
+      - CONFIG_SERVER_USERNAME=test
+      - CONFIG_SERVER_PASSWORD=test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/health"]
+      interval: 60s
+      timeout: 10s
+
+  gateway:
+    build: ./gateway/
+    restart: always
+    ports:
+      - "80:8080"
+    networks:
+      - sportsnob-network
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      orderservice:
+        condition: service_healthy
+    environment:
+      - EUREKA_ZONE=http://eurekaserver:8761/eureka/
+      - CONFIG_SERVER_USERNAME=test
+      - CONFIG_SERVER_PASSWORD=test
+      - CONFIG_SERVER_NAME=configserver
+
+  orderservice:
+    build: ./orderservice
+    restart: always
+    networks:
+      - sportsnob-network
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    environment:
+      - EUREKA_ZONE=http://eurekaserver:8761/eureka/
+      - CONFIG_SERVER_USERNAME=test
+      - CONFIG_SERVER_PASSWORD=test
+      - CONFIG_SERVER_NAME=configserver
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+
+networks:
+  sportsnob-network:

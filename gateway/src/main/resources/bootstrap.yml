@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: ${CONFIG_SERVER_NAME}
+      username: ${CONFIG_SERVER_USERNAME}
+      password: ${CONFIG_SERVER_USERNAME}
+  application:
+    name: gateway
+
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: ${EUREKA_ZONE}
+  instance:
+    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2

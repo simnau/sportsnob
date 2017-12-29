@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: ${CONFIG_SERVER_NAME}
+      username: ${CONFIG_SERVER_USERNAME}
+      password: ${CONFIG_SERVER_PASSWORD}
+  application:
+    name: order-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_ZONE}
+  instance:
+    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
